@@ -1,4 +1,4 @@
-namespace InfoTrackTask.Server.Models.dto;
+namespace InfoTrackTask.Server.Models;
 
 public class SolicitorRecord
 {

@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using InfoTrackTask.Server.Data;
-using InfoTrackTask.Server.Models.db;
-using InfoTrackTask.Server.Models.dto;
+using InfoTrackTask.Server.Entities;
+using InfoTrackTask.Server.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace InfoTrackTask.Server.Services

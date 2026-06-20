@@ -1,10 +1,8 @@
-using System.Threading;
 using InfoTrackTask.Server.Models;
-using InfoTrackTask.Server.Models.dto;
 using InfoTrackTask.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace InfoTrack.API.Controllers;
+namespace InfoTrackTask.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

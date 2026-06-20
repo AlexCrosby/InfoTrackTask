@@ -1,5 +1,4 @@
 using InfoTrackTask.Server.Models;
-using InfoTrackTask.Server.Models.dto;
 using InfoTrackTask.Server.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 

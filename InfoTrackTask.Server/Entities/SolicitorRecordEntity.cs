@@ -1,4 +1,4 @@
-namespace InfoTrackTask.Server.Models.db;
+namespace InfoTrackTask.Server.Entities;
 
 public class SolicitorRecordEntity
 {

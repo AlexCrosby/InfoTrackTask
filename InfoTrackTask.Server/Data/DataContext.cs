@@ -1,5 +1,6 @@
+using InfoTrackTask.Server.Entities;
 using Microsoft.EntityFrameworkCore;
-using InfoTrackTask.Server.Models.db;
+
 namespace InfoTrackTask.Server.Data;
 class DataContext : DbContext
 {

@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="infotracktask.client/infotracktask.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="InfoTrackTask.Server.Tests/InfoTrackTask.Server.Tests.csproj" />
+  <Project Path="InfoTrackTask.Server/InfoTrackTask.Server.csproj" />
+</Solution>

@@ -1,0 +1,108 @@
+#root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+th, td {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* ── Layout ── */
+.app-container {
+    padding: 2rem;
+    font-family: sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ── Subtitle ── */
+.app-subtitle {
+    color: #666;
+}
+
+/* ── Search form ── */
+.search-form {
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.search-input {
+    padding: 0.75rem;
+    width: 400px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.search-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    background-color: #007bc0;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #005f99;
+}
+
+/* ── Status ── */
+.status-loading {
+    color: orange;
+    font-weight: bold;
+}
+
+/* ── Results ── */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.results-table thead tr {
+    background-color: #f4f4f4;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+}
+
+.results-table th,
+.results-table td {
+    padding: 12px;
+}
+
+.results-table tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+.results-table .cell-name {
+    font-weight: bold;
+}
+
+.results-table .cell-address {
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.results-table .cell-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.link-website {
+    color: #007bc0;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.link-contact {
+    color: #2e7d32;
+    text-decoration: none;
+    font-size: 0.9rem;
+}

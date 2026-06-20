@@ -1,0 +1,128 @@
+# InfoTrackTask
+
+A full-stack SPA built with an **ASP.NET Core 10** Web API backend and a **React + Vite + TypeScript** frontend. The backend uses an in-memory SQLite database, so there is no database setup required.
+
+At the end of this README, you can find an analysis and future improvements section.
+
+---
+
+## Prerequisites
+
+| Tool | Version | Notes |
+|------|---------|-------|
+| [.NET SDK](https://dotnet.microsoft.com/download) | 10.0+ | Required for the backend |
+| [Node.js](https://nodejs.org/) | 18+ (LTS recommended) | Required for the frontend |
+| [npm](https://www.npmjs.com/) | Bundled with Node.js | Used to install frontend dependencies |
+
+To verify your installations:
+
+```bash
+dotnet --version
+node --version
+npm --version
+```
+
+---
+
+## Running the Project
+
+The project uses the ASP.NET Core SPA Proxy, which means **you only need to start the backend** — it will automatically launch the Vite dev server for the frontend alongside it.
+
+### 1. Install frontend dependencies
+
+Before running for the first time, install the Node packages:
+
+```bash
+cd infotracktask.client
+npm install
+```
+
+### 2. Trust the development HTTPS certificate
+
+The Vite dev server uses an ASP.NET Core developer certificate for HTTPS. If you haven't already trusted it, run:
+
+```bash
+dotnet dev-certs https --trust
+```
+
+### 3. Start the application
+
+From the repository root, run:
+
+```bash
+cd InfoTrackTask.Server
+dotnet run
+```
+
+The SPA proxy will start the Vite frontend automatically. Once both are ready, open your browser at:
+
+- **Frontend (React):** `https://localhost:58136`
+- **Backend API:** `https://localhost:7139`
+- **OpenAPI / Scalar docs:** `https://localhost:7139/openapi/v1.json`
+
+> **Note:** Port numbers are defined in `InfoTrackTask.Server/Properties/launchSettings.json` and `infotracktask.client/vite.config.ts`. If ports are in use, you can update them there.
+
+---
+
+## Running with Visual Studio / Rider
+
+Open `InfoTrackTask.slnx` in Visual Studio 2022 (v17.10+) or JetBrains Rider and press **F5** (or click **Run**). Both projects are configured as startup projects and will launch together automatically.
+
+---
+
+## Running Tests
+
+The test suite uses **xUnit** and lives in `InfoTrackTask.Server.Tests`.
+
+```bash
+dotnet test InfoTrackTask.Server.Tests
+```
+
+---
+
+## Project Structure
+
+```
+InfoTrackTask/
+├── InfoTrackTask.Server/          # ASP.NET Core 10 Web API
+│   ├── Controllers/               # API controllers
+│   ├── Data/                      # EF Core DbContext (in-memory SQLite)
+│   ├── Entities/                  # Database entity models
+│   ├── Models/                    # Request / response models
+│   ├── Services/                  # Business logic & scraper service
+│   └── Program.cs                 # App entry point & DI setup
+├── InfoTrackTask.Server.Tests/    # xUnit test project
+└── infotracktask.client/          # React + Vite + TypeScript frontend
+    ├── src/                       # React source files
+    └── vite.config.ts             # Vite config (proxy, HTTPS, ports)
+```
+
+---
+
+## Key Technical Details
+
+- **Database:** In-memory SQLite via Entity Framework Core — data is reset on every restart.
+- **HTTPS:** The Vite dev server proxies API calls (`/api/*`) to the .NET backend over HTTPS. Developer certificates are generated automatically on first run.
+- **SPA Integration:** The server is configured with `Microsoft.AspNetCore.SpaProxy`, which manages the frontend dev server lifecycle.
+
+
+## Analysis
+
+Initially I had plannned to just scrape the solicitors page and display a list of summariesed contact details for the solicitors. This ended up not being feasable due to two facts:
+- The page only displays a maximum of 75 results.
+- The listings were randomised on each request. Only the premium listings were constant (presumably because there was never more than 75 premium listings).
+
+Since I was unable to find any ways to order the results, or force any pagination with query strings, this led me to conclude that the only way to get the full list of solicitors would be to scrape the site multiple times.
+
+My first attempt at this let to a large delay between a user pressing search and the result appearing since it took many generations to build up the full list. To fix this I changed the API to return a stream. This way the front end could access the results as they were found and start displaying them immediately, while the backend continued to generate and process the next batch of results. Currently the system continues to attempt to find more results indefinitely until a new search is performed, but this could either be capped to a maximum number of runs, or until no new results are found in consecutive runs (but these would not guarantee all solicitors are found).
+
+To further improve this I added an in-memory database cache which saved solicitors as they were found and served them up immediately if the user searched a second time, before continutint to scrape in the background.
+
+For the sake of this task, I only implemented an in-memory database. This means that on restart, the database is wiped. Because of the short lifespan of this database, I did not implement any invalidating logic, so if a listing is removed from solicitors.com, it will remain in the database until the application is restarted. In a real database scenario, I would implement Time To Live logic so that if a certain solicitor is not found again after a certain timeframe, it would be removed.
+
+## Future Improvements
+
+Due to the time limit of the task, I decided to prioritise backend functionality. Some improvements I would make are:
+- Modify the frontend to display with infinite scrolling rather than just displaying every result.
+- Implement containers to containerise the application for ease of deployment
+- Add more unit tests since I only added minor tests to validate my scraping logic was working before starting the frontend.

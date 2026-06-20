@@ -1,0 +1,104 @@
+## -----------------------------------------------
+## .NET / ASP.NET Core
+## -----------------------------------------------
+
+# Build output
+bin/
+obj/
+out/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Publish output
+publish/
+PublishProfiles/
+
+# User-specific files
+*.user
+*.suo
+
+# .NET tool manifest (keep if checked in intentionally)
+# .config/dotnet-tools.json
+
+# Visual Studio test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+## -----------------------------------------------
+## Visual Studio
+## -----------------------------------------------
+
+.vs/
+*.rsuser
+
+# Rider
+.idea/
+
+# ReSharper
+_ReSharper*/
+*.ReSharper
+*.DotSettings.user
+
+# NCrunch
+*.ncrunch*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+## -----------------------------------------------
+## Node / JavaScript / Vite (infotracktask.client)
+## -----------------------------------------------
+
+node_modules/
+dist/
+dist-ssr/
+.vite/
+.cache/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Lock files — keep the one your team uses; ignore the rest
+# yarn.lock
+# pnpm-lock.yaml
+
+## -----------------------------------------------
+## OS & Editor
+## -----------------------------------------------
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# VS Code
+.vscode/
+
+# JetBrains (already covered above but belt-and-suspenders)
+*.iml

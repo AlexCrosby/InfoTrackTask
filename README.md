@@ -66,6 +66,35 @@ The SPA proxy will start the Vite frontend automatically. Once both are ready, o
 
 ---
 
+## Running in Production Mode
+
+In production, the React app is compiled into static files and served directly by ASP.NET Core — a single process handles everything with no Vite dev server.
+
+> **Important:** You must use `dotnet publish`, not `dotnet run`. `dotnet run` does not copy the frontend `dist` files into the output — `dotnet publish` does this automatically via the MSBuild project reference.
+
+### 1. Build the frontend
+
+From the repo root:
+
+```bash
+cd infotracktask.client
+npm run build
+cd ..
+```
+
+### 2. Publish and run
+
+```bash
+dotnet publish InfoTrackTask.Server -c Release -o ./publish
+./publish/InfoTrackTask.Server.exe
+```
+
+The app will be available at `http://localhost:5085` (or `https://localhost:7139` if HTTPS is configured). ASP.NET serves the compiled React app as static files and handles all `/api` requests on the same origin — no proxy needed.
+
+> **Note:** OpenAPI / Scalar docs (`/openapi/v1.json`) are only exposed in the `Development` environment and will **not** be available in the published output.
+
+---
+
 ## Running with Visual Studio / Rider
 
 Open `InfoTrackTask.slnx` in Visual Studio 2022 (v17.10+) or JetBrains Rider and press **F5** (or click **Run**). Both projects are configured as startup projects and will launch together automatically.

@@ -18,7 +18,9 @@ public class SolicitorsController : ControllerBase
     [HttpGet("stream")]
     public IAsyncEnumerable<SolicitorRecord> GetSolicitorsStream([FromQuery] string locations, CancellationToken cancellationToken)
     {
-        var locationList = locations.Split(',').Select(l => l.Trim()).ToList();
+        var locationList = locations.Split([',', ' '])
+            .Where(s=> !string.IsNullOrWhiteSpace(s))
+            .Select(l => l.Trim()).ToList();
 
         // .NET automatically optimizes IAsyncEnumerable endpoints to stream chunked JSON payloads to the browser
         return _scraperService.ScrapeSolicitorsAsync(locationList, cancellationToken);

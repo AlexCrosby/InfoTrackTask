@@ -2,6 +2,8 @@
 
 A full-stack SPA built with an **ASP.NET Core 10** Web API backend and a **React + Vite + TypeScript** frontend. The backend uses an in-memory SQLite database, so there is no database setup required.
 
+No CORS configuration is needed — the Vite dev server proxies all `/api` requests to the ASP.NET backend server-side, so the browser only ever communicates with a single origin. In production, the React app is served directly by ASP.NET, keeping them on the same origin.
+
 At the end of this README, you can find an analysis and future improvements section.
 
 ---
@@ -108,21 +110,24 @@ InfoTrackTask/
 
 ## Analysis
 
-Initially I had plannned to just scrape the solicitors page and display a list of summariesed contact details for the solicitors. This ended up not being feasable due to two facts:
+Initially I had planned to just scrape the solicitors page and display a list of summarised contact details for the solicitors. This ended up not being feasible due to two facts:
 - The page only displays a maximum of 75 results.
 - The listings were randomised on each request. Only the premium listings were constant (presumably because there was never more than 75 premium listings).
 
 Since I was unable to find any ways to order the results, or force any pagination with query strings, this led me to conclude that the only way to get the full list of solicitors would be to scrape the site multiple times.
 
-My first attempt at this let to a large delay between a user pressing search and the result appearing since it took many generations to build up the full list. To fix this I changed the API to return a stream. This way the front end could access the results as they were found and start displaying them immediately, while the backend continued to generate and process the next batch of results. Currently the system continues to attempt to find more results indefinitely until a new search is performed, but this could either be capped to a maximum number of runs, or until no new results are found in consecutive runs (but these would not guarantee all solicitors are found).
+My first attempt at this led to a large delay between a user pressing search and the result appearing since it took many generations to build up the full list. To fix this I changed the API to return a stream. This way the front end could access the results as they were found and start displaying them immediately, while the backend continued to generate and process the next batch of results. Currently the system continues to attempt to find more results until the first batch where no new results are found (per location). This does not guarantee every solicitor result is found, but allows the server to move into the next location if multiple are given. This could be altered to run indefinitely, or be capped to a specific number of runs.
 
-To further improve this I added an in-memory database cache which saved solicitors as they were found and served them up immediately if the user searched a second time, before continutint to scrape in the background.
+To further improve this I added an in-memory database cache which saved solicitors as they were found and served them up immediately if the user searched a second time, before continuing to scrape in the background.
 
 For the sake of this task, I only implemented an in-memory database. This means that on restart, the database is wiped. Because of the short lifespan of this database, I did not implement any invalidating logic, so if a listing is removed from solicitors.com, it will remain in the database until the application is restarted. In a real database scenario, I would implement Time To Live logic so that if a certain solicitor is not found again after a certain timeframe, it would be removed.
+
+Finally a major obstacle was the web scraping itself. Without being able to use third-party libraries to parse the page, I had to write some simple parser logic using Regex. While not ideal, this worked well enough for the purposes of this task, providing the layout never changes. However this is not optimal if the system ever needs expanding.
 
 ## Future Improvements
 
 Due to the time limit of the task, I decided to prioritise backend functionality. Some improvements I would make are:
 - Modify the frontend to display with infinite scrolling rather than just displaying every result.
+- Better validation for the request parameters.
 - Implement containers to containerise the application for ease of deployment
 - Add more unit tests since I only added minor tests to validate my scraping logic was working before starting the frontend.

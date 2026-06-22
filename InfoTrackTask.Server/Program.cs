@@ -12,13 +12,10 @@ keepAliveConnection.Open();
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlite(keepAliveConnection));
 
-
-
 // Explicitly resolve the factory dependencies alongside the HttpClient
-builder.Services.AddHttpClient<ISolicitorScraper, SolicitorScraper>((client, sp) =>
+builder.Services.AddHttpClient<ISolicitorScraper, SolicitorScraper>(client =>
     {
-        // If you need to configure the client options (like BaseAddress), do it here:
-        // client.BaseAddress = new Uri("https://www.solicitors.com/");
+        client.BaseAddress = new Uri("https://www.solicitors.com/");
     })
     .AddTypedClient<ISolicitorScraper>((httpClient, sp) => 
     {

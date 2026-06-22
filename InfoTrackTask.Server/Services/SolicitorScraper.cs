@@ -73,7 +73,7 @@ namespace InfoTrackTask.Server.Services
                 }
 
                 // 2. RUN CONTINUOUS LIVE SCRAPER ENGINE FOR ADDITIONAL DATA
-                string targetUrl = $"https://www.solicitors.com/conveyancing+{location}.html";
+                string targetUrl = $"conveyancing+{location}.html";
                 int pass = 1;
 
                 while (true)
@@ -101,6 +101,7 @@ namespace InfoTrackTask.Server.Services
                     _logger.LogInformation("[DIAGNOSTIC] Raw HTML characters downloaded: {Length}", htmlContent.Length);
                     _logger.LogInformation("[DIAGNOSTIC] ParseHtml extracted {Count} raw items from the page.", parsedBatch.Count());
                     // ========================================
+                    bool discoveredNewItemsInThisPass = false;
                     int newItemsCounter = 0;
 
                     foreach (var record in parsedBatch)
@@ -111,6 +112,7 @@ namespace InfoTrackTask.Server.Services
                         // If it's NOT in our seenRecords pool, it's a completely new layout entry
                         if (seenRecords.Add(signature))
                         {
+                            discoveredNewItemsInThisPass = true;
                             newItemsCounter++;
 
                             // Map the newly discovered row to database entity and add to context tracking
@@ -138,17 +140,19 @@ namespace InfoTrackTask.Server.Services
                         _logger.LogInformation("[CACHE-ENGINE] Saved {Count} newly discovered records to In-Memory database.", newItemsCounter);
                     }
 
-                    // If fewer than 75 results are returned, the total pool is smaller than the page
-                    // size — all available solicitors fit on one page, so there's nothing more to find.
-                    if (parsedBatch.Count < 75)
+                    // If less than 75 results, there won't be any additional results on refresh.
+                    if (parsedBatch.Count() < 75)
                     {
                         _logger.LogInformation("[STREAM] Page returned {Count} items (pool exhausted — under 75 max). Scraper finishing.", parsedBatch.Count);
                         break;
                     }
 
-                    // If exactly 75 results, the pool may be larger than the page. Since results are
-                    // randomised, we keep looping — a batch with no new items doesn't mean the pool is
-                    // exhausted. The CancellationToken (client disconnect) is the secondary exit.
+                    // Infinite loop termination rule: Exit instantly when data saturation occurs
+                    if (!discoveredNewItemsInThisPass)
+                    {
+                        _logger.LogWarning("[STREAM] Zero new rows detected. Scraper fully exhausted for {Location}.", location);
+                        break;
+                    }
 
                     pass++;
                     await Task.Delay(350, cancellationToken); // Respectful crawl delay

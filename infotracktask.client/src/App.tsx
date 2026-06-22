@@ -1,4 +1,15 @@
 import { useState, useRef, type SubmitEvent, type ChangeEvent } from 'react';
+
+const LOCATIONS = [
+    'London',
+    'Birmingham',
+    'Leeds',
+    'Manchester',
+    'Sheffield',
+    'Bradford',
+    'Liverpool',
+    'Bristol',
+];
 import './App.css';
 
 // 1. Define the structural contract matching your C# SolicitorRecord class
@@ -11,13 +22,16 @@ interface SolicitorRecord {
 }
 
 export default function App() {
-    const [locations, setLocations] = useState<string>('London');
+    const [selectedLocations, setSelectedLocations] = useState<string[]>(['London']);
     const [results, setResults] = useState<SolicitorRecord[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setLocations(e.target.value);
+    const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { value, checked } = e.target;
+        setSelectedLocations(prev =>
+            checked ? [...prev, value] : prev.filter(loc => loc !== value)
+        );
     };
 
     const handleSearch = async (e: SubmitEvent<HTMLFormElement>) => {
@@ -35,7 +49,8 @@ export default function App() {
         setResults([]); // Reset state for a fresh run
 
         try {
-            const response = await fetch(`/api/solicitors/stream?locations=${encodeURIComponent(locations)}`, {
+            const locationQuery = selectedLocations.join(',');
+            const response = await fetch(`/api/solicitors/stream?locations=${encodeURIComponent(locationQuery)}`, {
                 signal: controller.signal
             });
 
@@ -101,14 +116,25 @@ export default function App() {
             <p className="app-subtitle">Type locations to dynamically pull and merge rotated branch variations.</p>
 
             <form onSubmit={handleSearch} className="search-form">
-                <input
-                    type="text"
-                    value={locations}
-                    onChange={handleInputChange}
-                    placeholder="e.g. London, Manchester"
-                    className="search-input"
-                />
-                <button type="submit" className="search-button">
+                <div className="location-checkboxes">
+                    {LOCATIONS.map(location => (
+                        <label key={location} className="checkbox-label">
+                            <input
+                                type="checkbox"
+                                value={location}
+                                checked={selectedLocations.includes(location)}
+                                onChange={handleCheckboxChange}
+                                className="checkbox-input"
+                            />
+                            {location}
+                        </label>
+                    ))}
+                </div>
+                <button
+                    type="submit"
+                    className="search-button"
+                    disabled={selectedLocations.length === 0}
+                >
                     {loading ? 'Restart Search' : 'Gather Insights'}
                 </button>
             </form>

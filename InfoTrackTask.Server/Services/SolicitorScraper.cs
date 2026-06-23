@@ -198,13 +198,6 @@ namespace InfoTrackTask.Server.Services
                     RegexOptions.IgnoreCase);
                 string website = websiteMatch.Success ? websiteMatch.Groups[1].Value : string.Empty;
 
-                // Fallback for website if the structural layout varies slightly
-                if (string.IsNullOrEmpty(website))
-                {
-                    var altWebMatch = Regex.Match(block, @"href=""([^""]+)""[^>]*>([^<]*Website)", RegexOptions.IgnoreCase);
-                    website = altWebMatch.Success ? altWebMatch.Groups[1].Value : string.Empty;
-                }
-
                 // Extract Email Link: Look for the href of the enquiry form link
                 var emailMatch = Regex.Match(block, @"href=""([^""]*enquiry-form\.asp[^""]+)""", RegexOptions.IgnoreCase);
                 string emailLink = emailMatch.Success ? emailMatch.Groups[1].Value : string.Empty;
